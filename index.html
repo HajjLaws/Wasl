@@ -522,7 +522,10 @@ footer{border-top:1px solid var(--w-line)!important;background:#f7f3eb!important
   <h1>ربط نظام مقدمي خدمة حجاج الخارج<br>ولائحته التنفيذية</h1>
   <p class="lead">كل مادة نظامية، إلى جانب ما يقابلها من نصوص اللائحة التنفيذية — في مكان واحد، مرتّب ومصدره موثّق.</p>
   <div class="stat-row" id="statRow"></div>
+  <div class="wasl-actions" id="waslActions"></div>
 </section>
+
+<div id="waslBanners"></div>
 
 <div class="toolbar">
   <div class="search-box">
@@ -567,11 +570,11 @@ footer{border-top:1px solid var(--w-line)!important;background:#f7f3eb!important
 </div>
 
 <footer>
-  <nav class="footer-links" aria-label="روابط وزارة الحج والعمرة">
+  <nav class="footer-links" id="footerLinks" aria-label="روابط وزارة الحج والعمرة">
     <a href="https://www.haj.gov.sa" target="_blank" rel="noopener noreferrer">موقع وزارة الحج والعمرة</a>
     <a href="https://eservices.haj.gov.sa" target="_blank" rel="noopener noreferrer">الخدمات الإلكترونية</a>
   </nav>
-  <div class="footer-owner">الإدارة العامة للشؤون القانونية بوزارة الحج والعمرة</div>
+  <div class="footer-owner" id="footerOwner">الإدارة العامة للشؤون القانونية بوزارة الحج والعمرة</div>
 </footer>
 
 <script>
@@ -641,8 +644,8 @@ async function initSupabase(){
 const laihaMap = {};
 DATA.laihaList.forEach(l => laihaMap[l.id] = l);
 
-const TEAM = ["بتول عبدالمحسن جمعان الزهراني","رهف عبد الجبار الثقفي","روز مسيفر المطرفي","أبرار جابر السلمي","ليلى داحش محزري"];
-const SUPERVISOR = "أ. خولة عبد الرحمن البكري";
+let TEAM = ["بتول عبدالمحسن جمعان الزهراني","رهف عبد الجبار الثقفي","روز مسيفر المطرفي","أبرار جابر السلمي","ليلى داحش محزري"];
+let SUPERVISOR = "أ. خولة عبد الرحمن البكري";
 
 const grid = document.getElementById('grid');
 const overlay = document.getElementById('overlay');
@@ -977,7 +980,7 @@ function closeDetail(){
 
 function openAbout(){
   document.getElementById('teamList').innerHTML = TEAM.map(n=>`<li>${n}</li>`).join('');
-  document.getElementById('supervisorList').innerHTML = `<li>${SUPERVISOR}</li>`;
+  document.getElementById('supervisorList').innerHTML = [].concat(SUPERVISOR).map(n=>`<li>${n}</li>`).join('');
   aboutOverlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1099,6 +1102,74 @@ initSupabase();
     }catch(e){}
   }
   if(window.supabase) ready(); else window.addEventListener('load',ready,{once:true});
+})();
+</script>
+
+<style>
+.wasl-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:22px}
+.wasl-actions a{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:4px;font-weight:800;font-size:.92rem;text-decoration:none;border:1px solid var(--emerald);color:var(--emerald);background:#fff;transition:.15s}
+.wasl-actions a.main{background:var(--emerald);color:#fff}
+.wasl-actions a:hover,.wasl-actions a:focus-visible{filter:brightness(.92);transform:translateY(-1px)}
+#waslBanners{max-width:1180px;margin:0 auto 18px;padding:0 24px}
+#waslBanners:empty{display:none}
+.wasl-bn{position:relative;border-radius:6px;overflow:hidden;background:#eee}
+.wasl-bn a,.wasl-bn span.s{display:none}
+.wasl-bn .on{display:block}
+.wasl-bn img{display:block;width:100%;height:auto;max-height:340px;object-fit:cover}
+.wasl-dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:6px}
+.wasl-dots i{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.5;cursor:pointer}
+.wasl-dots i.on{opacity:1}
+@media(max-width:700px){#waslBanners{padding:0 12px}}
+</style>
+<script>
+(function(){
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const safe=u=>/^(https?:\/\/|mailto:|\/|\.\/|[\w.-]+\.html)/i.test(u||'')?u:'#';
+  const DBG=/[?&]debug/.test(location.search);
+  function dbg(t){if(!DBG)return;let d=document.getElementById('waslDbg');if(!d){d=document.createElement('pre');d.id='waslDbg';d.style.cssText='position:fixed;bottom:0;left:0;right:0;max-height:45vh;overflow:auto;margin:0;padding:10px;background:#111;color:#0f0;font-size:12px;z-index:99999;direction:ltr;white-space:pre-wrap';document.body.appendChild(d)}d.textContent+=t+'\n'}
+  async function run(){
+    dbg('index version: settings-v2');
+    if(typeof sb==='undefined'){dbg('ERROR: sb undefined');return}
+    try{
+      const {data:s,error:se}=await sb.from('site_settings').select('*').eq('id',1).maybeSingle();
+      dbg('settings: '+(se?'ERROR '+se.message:JSON.stringify(s)));
+      if(s){
+        const act=[];
+        if(s.system_url) act.push('<a class="main" href="'+esc(safe(s.system_url))+'" target="_blank" rel="noopener noreferrer">📜 '+esc(s.system_url_label||'نظام مقدمي خدمة حجاج الخارج')+'</a>');
+        if(s.regulation_url) act.push('<a href="'+esc(safe(s.regulation_url))+'" target="_blank" rel="noopener noreferrer">📘 '+esc(s.regulation_url_label||'اللائحة التنفيذية')+'</a>');
+        if(s.pdf_path){
+          const u=sb.storage.from('documents').getPublicUrl(s.pdf_path,{download:'نظام-مقدمي-خدمة-حجاج-الخارج.pdf'}).data.publicUrl;
+          act.push('<a href="'+esc(u)+'" rel="noopener">⬇ تحميل ملف النظام (PDF)</a>');
+        }
+        document.getElementById('waslActions').innerHTML=act.join('');
+        if(Array.isArray(s.footer_links)&&s.footer_links.length){
+          document.getElementById('footerLinks').innerHTML=s.footer_links.map(l=>'<a href="'+esc(safe(l.url))+'" target="_blank" rel="noopener noreferrer">'+esc(l.label)+'</a>').join('');
+        }
+        if(s.footer_text) document.getElementById('footerOwner').textContent=s.footer_text;
+        if(s.team_names&&s.team_names.length) TEAM=s.team_names;
+        if(s.supervisors&&s.supervisors.length) SUPERVISOR=s.supervisors;
+      }
+    }catch(e){console.error('settings',e);dbg('settings EXC '+e.message)}
+    try{
+      const now=Date.now();
+      const {data:b,error:be}=await sb.from('banners').select('*').eq('is_active',true).order('sort_order').order('id');
+      dbg('banners: '+(be?'ERROR '+be.message:JSON.stringify(b)));
+      const list=(b||[]).filter(x=>(!x.starts_at||new Date(x.starts_at)<=now)&&(!x.ends_at||new Date(x.ends_at)>=now));
+      if(!list.length) return;
+      const el=document.getElementById('waslBanners');
+      el.innerHTML='<div class="wasl-bn">'+list.map((x,i)=>{
+        const img='<img src="'+esc(sb.storage.from('banners').getPublicUrl(x.image_path).data.publicUrl)+'" alt="'+esc(x.alt_text)+'">';
+        return x.link_url?'<a class="'+(i?'':'on')+'" href="'+esc(safe(x.link_url))+'" target="_blank" rel="noopener noreferrer">'+img+'</a>':'<span class="s '+(i?'':'on')+'">'+img+'</span>';
+      }).join('')+(list.length>1?'<div class="wasl-dots">'+list.map((_,i)=>'<i class="'+(i?'':'on')+'"></i>').join('')+'</div>':'')+'</div>';
+      if(list.length>1){
+        const items=el.querySelectorAll('.wasl-bn>a,.wasl-bn>span.s'),dots=el.querySelectorAll('.wasl-dots i');let k=0;
+        const show=n=>{items[k].classList.remove('on');dots[k].classList.remove('on');k=n;items[k].classList.add('on');dots[k].classList.add('on')};
+        dots.forEach((d,i)=>d.onclick=()=>show(i));
+        setInterval(()=>show((k+1)%items.length),5000);
+      }
+    }catch(e){console.error('banners',e);dbg('banners EXC '+e.message)}
+  }
+  if(document.readyState==='complete') run(); else window.addEventListener('load',run,{once:true});
 })();
 </script>
 </body>

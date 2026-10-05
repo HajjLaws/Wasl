@@ -124,7 +124,7 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=i=>document.getElementById(i), V=()=>$('view');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let me=null,canEdit=false,kind='nizam_articles',tab='art';
-function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600)}
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',6000)}
 async function chk(p){const r=await p;if(r.error){toast('تعذّر التنفيذ: '+r.error.message);throw r.error}return r.data}
 function loginMsg(m){const e=$('lerr');if(e){e.textContent=m||'';e.style.display=m?'block':'none'}}
 async function boot(){
@@ -196,7 +196,10 @@ async function mv(i,d){const a=_L[i],b=_L[i+d];if(!b)return;
 async function vSet(){
   const s=await chk(sb.from('site_settings').select('*').eq('id',1).single());
   const ls=x=>(x||[]).join('\n');
-  V().innerHTML=`${ro()}<div class="card"><h3>رابط اللائحة التنفيذية</h3>
+  V().innerHTML=`${ro()}<div class="card"><h3>رابط النظام</h3>
+  <label>نص الزر</label><input id="s_slab" value="${esc(s.system_url_label)}" placeholder="نظام مقدمي خدمة حجاج الخارج">
+  <label>الرابط (اتركه فارغًا لإخفاء الخانة)</label><input id="s_surl" dir="ltr" value="${esc(s.system_url)}" placeholder="https://..."></div>
+  <div class="card"><h3>رابط اللائحة التنفيذية</h3>
   <label>نص الزر</label><input id="s_lab" value="${esc(s.regulation_url_label)}">
   <label>الرابط (اتركه فارغًا لإخفاء الخانة)</label><input id="s_url" dir="ltr" value="${esc(s.regulation_url)}"></div>
   <div class="card"><h3>التذييل</h3><label>النص</label><input id="s_ft" value="${esc(s.footer_text)}">
@@ -211,10 +214,21 @@ async function vSet(){
 async function saveSet(){
   const L=x=>x.split('\n').map(t=>t.trim()).filter(Boolean);
   const links=L($('s_fl').value).map(t=>{const i=t.lastIndexOf('|');return{label:t.slice(0,i).trim(),url:t.slice(i+1).trim()}}).filter(l=>l.label&&l.url);
-  await chk(sb.from('site_settings').update({regulation_url_label:$('s_lab').value.trim()||'اللائحة التنفيذية',regulation_url:$('s_url').value.trim()||null,footer_text:$('s_ft').value,footer_links:links,team_names:L($('s_tm').value),supervisors:L($('s_sv').value)}).eq('id',1));toast('تم الحفظ')}
-async function upPdf(){const f=$('pdf').files[0];if(!f)return toast('اختر ملف PDF');
-  await chk(sb.storage.from('documents').upload('system.pdf',f,{upsert:true,contentType:'application/pdf',cacheControl:'60'}));
-  await chk(sb.from('site_settings').update({pdf_path:'system.pdf'}).eq('id',1));toast('تم رفع الملف');vSet()}
+  const rows=await chk(sb.from('site_settings').update({system_url_label:$('s_slab').value.trim()||'نظام مقدمي خدمة حجاج الخارج',system_url:$('s_surl').value.trim()||null,regulation_url_label:$('s_lab').value.trim()||'اللائحة التنفيذية',regulation_url:$('s_url').value.trim()||null,footer_text:$('s_ft').value,footer_links:links,team_names:L($('s_tm').value),supervisors:L($('s_sv').value)}).eq('id',1).select());
+  if(!rows.length)return toast('لم يُحفظ شيء: لا يوجد سجل إعدادات (id=1) أو ليست لديك صلاحية تعديل');
+  toast('تم الحفظ بنجاح')}
+async function upPdf(){
+  const f=$('pdf').files[0];if(!f)return toast('اختر ملف PDF أولًا');
+  if(f.type&&f.type!=='application/pdf')return toast('الملف المختار ليس PDF');
+  const b=document.querySelector('[onclick="upPdf()"]');if(b){b.disabled=true;b.textContent='جارٍ الرفع...'}
+  try{
+    const name='system-'+Date.now()+'.pdf';
+    await chk(sb.storage.from('documents').upload(name,f,{contentType:'application/pdf',cacheControl:'60'}));
+    const rows=await chk(sb.from('site_settings').update({pdf_path:name}).eq('id',1).select());
+    if(!rows.length)return toast('رُفع الملف لكن لم يُحفظ مساره: لا يوجد سجل إعدادات (id=1) أو لا توجد صلاحية');
+    toast('تم رفع الملف وحفظه');vSet();
+  }catch(e){console.error(e)}
+  finally{if(b){b.disabled=false;b.textContent='رفع / استبدال'}}}
 
 async function vBan(){
   const B=await chk(sb.from('banners').select('*').order('sort_order').order('id'));

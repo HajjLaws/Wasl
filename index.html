@@ -1109,13 +1109,14 @@ initSupabase();
 .wasl-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:22px}
 .wasl-actions a{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:4px;font-weight:800;font-size:.92rem;text-decoration:none;border:1px solid var(--emerald);color:var(--emerald);background:#fff;transition:.15s}
 .wasl-actions a.main{background:var(--emerald);color:#fff}
+.wasl-actions .ic{width:20px;height:20px;flex:none}
 .wasl-actions a:hover,.wasl-actions a:focus-visible{filter:brightness(.92);transform:translateY(-1px)}
 #waslBanners{max-width:1180px;margin:0 auto 18px;padding:0 24px}
 #waslBanners:empty{display:none}
 .wasl-bn{position:relative;border-radius:6px;overflow:hidden;background:#eee}
 .wasl-bn a,.wasl-bn span.s{display:none}
 .wasl-bn .on{display:block}
-.wasl-bn img{display:block;width:100%;height:auto;max-height:340px;object-fit:cover}
+.wasl-bn img{display:block;width:100%;height:auto}
 .wasl-dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:6px}
 .wasl-dots i{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.5;cursor:pointer}
 .wasl-dots i.on{opacity:1}
@@ -1135,11 +1136,11 @@ initSupabase();
       dbg('settings: '+(se?'ERROR '+se.message:JSON.stringify(s)));
       if(s){
         const act=[];
-        if(s.system_url) act.push('<a class="main" href="'+esc(safe(s.system_url))+'" target="_blank" rel="noopener noreferrer">📜 '+esc(s.system_url_label||'نظام مقدمي خدمة حجاج الخارج')+'</a>');
-        if(s.regulation_url) act.push('<a href="'+esc(safe(s.regulation_url))+'" target="_blank" rel="noopener noreferrer">📘 '+esc(s.regulation_url_label||'اللائحة التنفيذية')+'</a>');
+        if(s.system_url) act.push('<a class="main" href="'+esc(safe(s.system_url))+'" target="_blank" rel="noopener noreferrer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'+esc(s.system_url_label||'نظام مقدمي خدمة حجاج الخارج')+'</a>');
+        if(s.regulation_url) act.push('<a href="'+esc(safe(s.regulation_url))+'" target="_blank" rel="noopener noreferrer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'+esc(s.regulation_url_label||'اللائحة التنفيذية')+'</a>');
         if(s.pdf_path){
           const u=sb.storage.from('documents').getPublicUrl(s.pdf_path,{download:'نظام-مقدمي-خدمة-حجاج-الخارج.pdf'}).data.publicUrl;
-          act.push('<a href="'+esc(u)+'" rel="noopener">⬇ تحميل ملف النظام (PDF)</a>');
+          act.push('<a href="'+esc(u)+'" rel="noopener"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>تحميل ملف النظام (PDF)</a>');
         }
         document.getElementById('waslActions').innerHTML=act.join('');
         if(Array.isArray(s.footer_links)&&s.footer_links.length){

@@ -26,7 +26,88 @@ textarea{min-height:110px}label{font-size:.85rem;color:var(--m);font-weight:700}
 .tag{font-size:.75rem;background:var(--b);padding:1px 8px;border-radius:99px}
 #toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--t);color:#fff;padding:9px 18px;border-radius:99px;display:none;z-index:9}
 #login{max-width:360px;margin:12vh auto;padding:0 16px}img.pv{height:70px;border-radius:8px}h3{color:var(--t);margin:.2rem 0 .8rem}
-</style></head><body>
+</style>
+<style id="wasl-identity-adaptation">
+:root{
+  --wasl-teal:#073f3d;
+  --wasl-teal-2:#0b5752;
+  --wasl-cream:#f7f2e8;
+  --wasl-paper:#fffdf9;
+  --wasl-sand:#e9dfcf;
+  --wasl-gold:#b49a79;
+  --wasl-gold-soft:#d9c8ae;
+  --wasl-line:#d7ccbb;
+  --wasl-ink:#343331;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%;}
+body{
+  background:
+    linear-gradient(rgba(255,253,249,.88),rgba(255,253,249,.88)),
+    repeating-linear-gradient(45deg,transparent 0 34px,rgba(180,154,121,.045) 34px 35px),
+    repeating-linear-gradient(-45deg,transparent 0 34px,rgba(7,63,61,.035) 34px 35px),
+    var(--wasl-cream);
+  color:var(--wasl-ink);
+}
+body:before{
+  content:"";display:block;height:7px;background:linear-gradient(90deg,transparent 0 7%,var(--wasl-gold-soft) 7% 7.2%,transparent 7.2% 92.8%,var(--wasl-gold-soft) 92.8% 93%,transparent 93%);
+  opacity:.75;
+}
+header{
+  position:relative;background:var(--wasl-teal);padding:18px 24px;
+  box-shadow:0 8px 28px rgba(7,63,61,.16);border-bottom:1px solid rgba(217,200,174,.5);
+}
+header:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.10;background-image:linear-gradient(45deg,transparent 46%,#fff 47%,#fff 49%,transparent 50%),linear-gradient(-45deg,transparent 46%,#fff 47%,#fff 49%,transparent 50%);background-size:56px 56px;}
+header>div,header>button{position:relative;z-index:1}
+header b{font-size:1.12rem;letter-spacing:.2px;color:#fff}
+header small{color:#dfcfb5}
+header button{border-color:rgba(255,255,255,.32);background:transparent;color:#fff;border-radius:4px;padding:7px 16px}
+header button:hover{background:rgba(255,255,255,.10)}
+nav{
+  background:rgba(255,253,249,.96);border-bottom:1px solid var(--wasl-line);padding:12px 16px;gap:8px;
+  box-shadow:0 3px 16px rgba(67,55,39,.05);scrollbar-width:thin;
+}
+nav button{border:1px solid var(--wasl-line);background:var(--wasl-paper);color:var(--wasl-teal);border-radius:3px;padding:8px 18px;font-weight:800;transition:.18s}
+nav button:hover{border-color:var(--wasl-gold);background:#faf5ec}
+nav button.on{background:var(--wasl-teal);border-color:var(--wasl-teal);color:#fff;box-shadow:inset 0 -3px 0 var(--wasl-gold)}
+main{max-width:1080px;padding:22px 18px 50px}
+.card{
+  background:rgba(255,253,249,.97);border:1px solid var(--wasl-line);border-radius:14px;padding:18px;margin-bottom:15px;
+  box-shadow:0 8px 24px rgba(70,58,42,.06);position:relative;overflow:hidden;
+}
+.card:before{content:"";position:absolute;top:0;right:0;width:74px;height:3px;background:var(--wasl-gold)}
+h3{color:var(--wasl-teal);font-size:1.08rem;font-weight:800}
+label{color:#7d6a52;font-weight:800}
+input,select,textarea{border:1px solid #d7cec0;background:#fffefa;color:var(--wasl-ink);border-radius:8px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--wasl-gold);box-shadow:0 0 0 3px rgba(180,154,121,.12)}
+button{border-color:var(--wasl-gold);color:var(--wasl-teal);background:#fffdf8;border-radius:7px}
+button.p{background:var(--wasl-teal);border-color:var(--wasl-teal);color:#fff}
+button.p:hover{background:var(--wasl-teal-2)}
+button.on{background:var(--wasl-teal);border-color:var(--wasl-teal);color:#fff}
+button.d{border-color:#a14b43;color:#963f37;background:#fff9f7}
+.item{padding:12px 8px;border-bottom:1px solid #e4dbcf}
+.item:hover{background:#fbf6ed}
+.tag{background:#eee5d7;color:#7a684f;border:1px solid #ddcfba}
+#login{max-width:430px;margin:9vh auto;padding:0 18px}
+#login .card{padding:28px 24px}
+#login .card:after{content:"";display:block;height:1px;background:linear-gradient(90deg,transparent,var(--wasl-gold),transparent);margin:22px 0 0}
+#login h3{text-align:center;font-size:1.3rem;margin-bottom:20px}
+#toast{background:var(--wasl-teal);border:1px solid var(--wasl-gold);box-shadow:0 10px 30px rgba(7,63,61,.22)}
+img.pv{border-radius:6px;border:1px solid var(--wasl-line);object-fit:cover}
+@media(max-width:640px){
+ body:before{height:4px}
+ header{padding:14px 14px}
+ header b{font-size:.98rem}
+ nav{padding:9px 10px;gap:6px}
+ nav button{padding:7px 12px;font-size:.78rem}
+ main{padding:14px 10px 36px}
+ .card{padding:14px;margin-bottom:11px}
+ .row>.f{min-width:100%}
+ #login{margin:7vh auto;padding:0 12px}
+}
+</style>
+
+</head><body>
 <div id="login"><div class="card"><h3>تسجيل دخول الإدارة</h3>
 <label>البريد الإلكتروني</label><input id="em" type="email" dir="ltr">
 <label>كلمة المرور</label><input id="pw" type="password" dir="ltr">
@@ -36,7 +117,8 @@ textarea{min-height:110px}label{font-size:.85rem;color:var(--m);font-weight:700}
 <nav id="nav"></nav><main id="view"></main></div>
 <div id="toast"></div>
 <script>
-const SUPABASE_URL='PUT_PROJECT_URL', SUPABASE_KEY='PUT_ANON_KEY';
+const SUPABASE_URL='https://rvzipxbfkvnzpazoozur.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2emlweGJma3ZuenBhem9venVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExOTk5NDMsImV4cCI6MjEwNjc3NTk0M30.0DP9cDH4YGDAQolaRfFLWryz58CvPslxYQJ2ZUS-rks';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=i=>document.getElementById(i), V=()=>$('view');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

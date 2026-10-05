@@ -506,6 +506,12 @@ footer{border-top:1px solid var(--w-line)!important;background:#f7f3eb!important
     <path d="M10 17l5-5-5-5M15 12H3"/>
   </svg><span>دخول الإدارة</span>
 </a>
+<style>
+.wasl-admin-login{position:fixed!important;top:18px;right:18px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border:1px solid rgba(174,145,78,.55);border-radius:999px;background:rgba(250,247,239,.96);color:#173f32;text-decoration:none;font-weight:700;font-size:13px;box-shadow:0 6px 20px rgba(25,45,35,.10);backdrop-filter:blur(8px);transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
+.wasl-admin-login:hover{transform:translateY(-2px);box-shadow:0 9px 25px rgba(25,45,35,.15);background:#fffdf8}
+.wasl-admin-login svg{width:17px;height:17px;flex:none}
+@media(max-width:700px){.wasl-admin-login{top:10px;right:10px;padding:9px 12px;font-size:12px}.wasl-admin-login svg{width:15px;height:15px}}
+</style>
 </header>
 
 <section class="hero">
@@ -916,7 +922,8 @@ function openDetail(id){
     <div id="compareWrap">${renderDetailBody(a)}</div>
     <div class="detail-actions">
       <button class="btn" id="favDetailBtn">${isFav(a.id) ? '★ إزالة من المفضلة' : '☆ إضافة للمفضلة'}</button>
-      <button class="btn" id="copyBtn">📋 نسخ النصين</button>
+      <button class="btn" id="copySystemBtn">📋 نسخ نص النظام</button>
+      <button class="btn" id="copyRegBtn">📋 نسخ نص اللائحة</button>
       <button class="btn" id="printBtn">🖨 طباعة</button>
     </div>
   `;
@@ -928,15 +935,28 @@ function openDetail(id){
   });
   if(prev) document.getElementById('prevBtn').addEventListener('click', ()=> openDetail(prev.id));
   if(next) document.getElementById('nextBtn').addEventListener('click', ()=> openDetail(next.id));
-  document.getElementById('copyBtn').addEventListener('click', ()=>{
-    const regText = a.laiha.map(lid => laihaMap[lid] ? `${laihaMap[lid].title}\n${laihaMap[lid].text}` : '').join('\n\n');
-    const full = `${a.title}\n${a.text}\n\n— اللائحة التنفيذية —\n${regText || 'لا يوجد نص مقابل'}`;
-    navigator.clipboard.writeText(full).then(()=>{
-      const btn = document.getElementById('copyBtn');
-      const old = btn.innerHTML;
-      btn.innerHTML = '✓ تم النسخ';
+  const copyText = async (text, btn, successLabel) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        document.execCommand('copy'); ta.remove();
+      }
+      const old = btn.innerHTML; btn.innerHTML = `✓ ${successLabel}`;
       setTimeout(()=> btn.innerHTML = old, 1500);
-    });
+    } catch (err) {
+      alert('تعذر نسخ النص تلقائيًا، يرجى المحاولة مرة أخرى.');
+    }
+  };
+  document.getElementById('copySystemBtn').addEventListener('click', ()=>{
+    copyText(`${a.title}\n${a.text}`, document.getElementById('copySystemBtn'), 'تم نسخ نص النظام');
+  });
+  document.getElementById('copyRegBtn').addEventListener('click', ()=>{
+    const regText = a.laiha.map(lid => laihaMap[lid] ? `${laihaMap[lid].title}\n${laihaMap[lid].text}` : '').filter(Boolean).join('\n\n');
+    copyText(regText || 'لا يوجد نص مقابل في اللائحة التنفيذية', document.getElementById('copyRegBtn'), 'تم نسخ نص اللائحة');
   });
   document.getElementById('printBtn').addEventListener('click', ()=> window.print());
 

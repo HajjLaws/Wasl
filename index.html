@@ -642,7 +642,11 @@ async function initSupabase(){
 
 <script>
 const laihaMap = {};
-DATA.laihaList.forEach(l => laihaMap[l.id] = l);
+function rebuildLaihaMap(){
+  Object.keys(laihaMap).forEach(k=>delete laihaMap[k]);
+  DATA.laihaList.forEach(l => laihaMap[l.id] = l);
+}
+rebuildLaihaMap();
 
 let TEAM = ["بتول عبدالمحسن جمعان الزهراني","رهف عبد الجبار الثقفي","روز مسيفر المطرفي","أبرار جابر السلمي","ليلى داحش محزري"];
 let SUPERVISOR = "أ. خولة عبد الرحمن البكري";
@@ -814,6 +818,7 @@ function matchesQuery(article, q){
 }
 
 function render(){
+  rebuildLaihaMap();
   let items = DATA.nizam.filter(a => {
     if(activeFilter === 'linked' && a.laiha.length === 0) return false;
     if(activeFilter === 'none' && a.laiha.length > 0) return false;

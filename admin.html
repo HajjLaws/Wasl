@@ -111,6 +111,7 @@ img.pv{border-radius:6px;border:1px solid var(--wasl-line);object-fit:cover}
 <div id="login"><div class="card"><h3>تسجيل دخول الإدارة</h3>
 <label>البريد الإلكتروني</label><input id="em" type="email" dir="ltr">
 <label>كلمة المرور</label><input id="pw" type="password" dir="ltr">
+<div id="lerr" style="display:none;background:#fdecea;color:#b3261e;border-radius:8px;padding:9px 11px;margin:10px 0;font-size:.85rem;line-height:1.7"></div>
 <button class="p" id="go" style="width:100%">دخول</button></div></div>
 <div id="app" style="display:none">
 <header><div><b>لوحة إدارة المنصة</b><br><small id="who"></small></div><button id="out">خروج</button></header>
@@ -125,15 +126,28 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 let me=null,canEdit=false,kind='nizam_articles',tab='art';
 function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600)}
 async function chk(p){const r=await p;if(r.error){toast('تعذّر التنفيذ: '+r.error.message);throw r.error}return r.data}
+function loginMsg(m){const e=$('lerr');if(e){e.textContent=m||'';e.style.display=m?'block':'none'}}
 async function boot(){
   const {data:{session}}=await sb.auth.getSession();
   if(!session){$('login').style.display='block';$('app').style.display='none';return}
-  const {data:p}=await sb.from('profiles').select('*').eq('user_id',session.user.id).maybeSingle();
-  if(!p||!p.is_active){await sb.auth.signOut();toast('حسابك غير مفعّل');$('login').style.display='block';return}
+  const {data:p,error:pe}=await sb.from('profiles').select('*').eq('user_id',session.user.id).maybeSingle();
+  if(pe){console.error('profiles error',pe);await sb.auth.signOut();$('login').style.display='block';$('app').style.display='none';loginMsg('تعذّرت قراءة جدول profiles: '+pe.message+' (غالبًا سياسة RLS تمنع القراءة)');return}
+  if(!p){await sb.auth.signOut();$('login').style.display='block';$('app').style.display='none';loginMsg('تم تسجيل الدخول، لكن لا يوجد سجل لهذا الحساب في جدول profiles (user_id = '+session.user.id+')');return}
+  if(!p.is_active){await sb.auth.signOut();$('login').style.display='block';$('app').style.display='none';loginMsg('الحساب موجود لكنه غير مفعّل (is_active = false)');return}
+  loginMsg('');
   me=p;canEdit=['super_admin','editor'].includes(p.role);
-  $('who').textContent=(p.full_name||session.user.email)+' — '+({super_admin:'مدير عام',editor:'محرر',viewer:'مراجع'}[p.role]);
+  $('who').textContent=(p.full_name||session.user.email)+' — '+({super_admin:'مدير عام',editor:'محرر',viewer:'مراجع'}[p.role]||p.role);
   $('login').style.display='none';$('app').style.display='block';go(tab)}
-$('go').onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$('em').value.trim(),password:$('pw').value});if(error)return toast('البريد أو كلمة المرور غير صحيحة');boot()};
+$('go').onclick=async()=>{
+  loginMsg('');const b=$('go');b.disabled=true;
+  try{
+    const {error}=await sb.auth.signInWithPassword({email:$('em').value.trim(),password:$('pw').value});
+    if(error){console.error('signIn error',error);
+      const m=(error.message||'').toLowerCase();
+      loginMsg(m.includes('invalid login')?'البريد أو كلمة المرور غير صحيحة':m.includes('confirm')?'البريد الإلكتروني غير مؤكَّد في Supabase (Authentication ← Users)':m.includes('api key')?'مفتاح Supabase (anon key) غير صالح لهذا المشروع':'تعذّر تسجيل الدخول: '+error.message);return}
+    await boot();
+  }catch(e){console.error(e);loginMsg('تعذّر الاتصال بـ Supabase: '+(e.message||e))}
+  finally{b.disabled=false}};
 $('out').onclick=async()=>{await sb.auth.signOut();boot()};
 const TABS=[['art','المواد'],['link','الربط والترتيب'],['set','الإعدادات والملف'],['ban','البنرات'],['log','سجل التعديلات']];
 function go(t){tab=t;$('nav').innerHTML=TABS.map(([k,n])=>`<button class="${k==t?'on':''}" onclick="go('${k}')">${n}</button>`).join('');({art:vArt,link:vLink,set:vSet,ban:vBan,log:vLog})[t]()}

@@ -469,18 +469,28 @@ footer{border-top:1px solid var(--w-line)!important;background:#f7f3eb!important
 <style id="wasl-admin-login-style">
 .wasl-admin-login{
   display:inline-flex;align-items:center;justify-content:center;gap:9px;
-  min-height:42px;padding:0 17px;border:1px solid rgba(176,146,104,.65);
-  border-radius:10px;background:#073f3d;color:#fff;text-decoration:none;
+  min-height:42px;padding:0 17px;border:1px solid rgba(176,146,104,.75);
+  border-radius:10px;background:#efe4cc;color:#073f3d;text-decoration:none;
   font-weight:700;font-size:.92rem;letter-spacing:.01em;
-  box-shadow:0 5px 18px rgba(7,63,61,.10);
+  box-shadow:0 5px 18px rgba(120,95,50,.12);
   transition:transform .18s ease,background .18s ease,box-shadow .18s ease;
   white-space:nowrap
 }
-.wasl-admin-login:hover{transform:translateY(-1px);background:#0a5551;box-shadow:0 8px 22px rgba(7,63,61,.16)}
+.wasl-admin-login:hover{transform:translateY(-1px);background:#e6d8b8;box-shadow:0 8px 22px rgba(120,95,50,.20)}
 .wasl-admin-login svg{width:18px;height:18px;flex:none}
 @media(max-width:700px){
  .wasl-admin-login{min-height:38px;padding:0 12px;font-size:.84rem;gap:6px}
  .wasl-admin-login span{display:none}
+}
+@media(max-width:700px){
+ .top-inner .brand{order:1;flex:1 1 0}
+ .top-inner .wasl-admin-login{order:2;flex:none}
+ .top-inner nav.links{order:3;flex:1 0 100%;justify-content:center}
+}
+@media(max-width:700px){
+ .top-inner .brand{order:1;flex:1 1 0}
+ .top-inner .wasl-admin-login{order:2;flex:none}
+ .top-inner nav.links{order:3;flex:1 0 100%;justify-content:center}
 }
 </style>
 </head>
@@ -499,19 +509,13 @@ footer{border-top:1px solid var(--w-line)!important;background:#f7f3eb!important
       <a data-nav="favorites">المفضلة</a>
       <a data-nav="about">عن المنصة</a>
     </nav>
-  </div>
-<a class="wasl-admin-login" id="waslAdminLogin" href="admin(8).html" aria-label="دخول الإدارة" title="دخول الإدارة">
+    <a class="wasl-admin-login" id="waslAdminLogin" href="admin.html" aria-label="دخول الإدارة" title="دخول الإدارة">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
     <path d="M10 17l5-5-5-5M15 12H3"/>
   </svg><span>دخول الإدارة</span>
 </a>
-<style>
-.wasl-admin-login{position:fixed!important;top:18px;right:18px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border:1px solid rgba(174,145,78,.55);border-radius:999px;background:rgba(250,247,239,.96);color:#173f32;text-decoration:none;font-weight:700;font-size:13px;box-shadow:0 6px 20px rgba(25,45,35,.10);backdrop-filter:blur(8px);transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
-.wasl-admin-login:hover{transform:translateY(-2px);box-shadow:0 9px 25px rgba(25,45,35,.15);background:#fffdf8}
-.wasl-admin-login svg{width:17px;height:17px;flex:none}
-@media(max-width:700px){.wasl-admin-login{top:10px;right:10px;padding:9px 12px;font-size:12px}.wasl-admin-login svg{width:15px;height:15px}}
-</style>
+  </div>
 </header>
 
 <section class="hero">
@@ -1081,12 +1085,10 @@ initSupabase();
 (function(){
   const btn=document.getElementById('waslAdminLogin');
   if(!btn) return;
-  const url='https://dsinztikwvuqhhwrhisg.supabase.co';
-  const key='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkc2luenRpa3d2dXFoaHdySGlzZyIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzkwODU0NjA3LCJleHAiOjIxMDY0MzA2MH0.MhBz5vD_s4u87y6c0tz1LgPtx18sjuEir0tju0f-ieQ';
   function ready(){
     try{
       if(!window.supabase) return;
-      const client=window.supabase.createClient(url,key);
+      const client=(typeof sb!=='undefined'&&sb)?sb:window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
       client.auth.getSession().then(function(res){
         if(res && res.data && res.data.session){
           btn.querySelector('span').textContent='لوحة الإدارة';
